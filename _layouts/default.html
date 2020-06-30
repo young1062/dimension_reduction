@@ -24,10 +24,10 @@
       <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
       <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
         <a href="index" class="btn">Home </a>
-        <a href="notes" class="btn">Lecture Notes </a>
-        <a href="numerics" class="btn">Numerical Examples </a>
-        <a href="calendar" class="btn">Calendar and Assignments </a>
-        <a href="about" class="btn">About the Author </a>
+        <a href="web_content/notes" class="btn">Lecture Notes </a>
+        <a href="web_content/numerics" class="btn">Numerics/Demos </a>
+        <a href="web_content/calendar" class="btn">Calendar and Assignments </a>
+        <a href="web_content/about" class="btn">About the Author </a>
       {% if site.github.is_project_page %}
         <a href="{{ site.github.repository_url }}" class="btn">View on Github</a>
       {% endif %}
