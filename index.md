@@ -1,5 +1,3 @@
-layout: page
-title: "Welcome"
 
 <h1> Welcome </h1>
 This webpage contains content for my introductory course in Dimension Reduction first taught at Harvard University during the Fall 2019 semester.   
