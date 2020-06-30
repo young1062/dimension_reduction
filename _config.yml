@@ -1,2 +1,6 @@
 theme: jekyll-theme-cayman
 title: "Introduction to Dimension Reduction"
+header_pages:
+  - notes.md
+  - numerics.md
+  - about.md
