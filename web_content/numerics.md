@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 ---
 
 <h2> Supplementary Numerical Examples </h2>

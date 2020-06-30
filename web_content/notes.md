@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 ---
 
 The links below contain pdf files of the scanned lecture notes for all topics covered in the course. 

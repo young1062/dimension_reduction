@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: page
 ---
 
 <h2> Sample Calendar and Assignments </h2>
