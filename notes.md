@@ -1,6 +1,7 @@
+---
 layout: page
 title: "Lecture Notes"
-permalink: /notes/
+---
 
 <h2> Lecture Notes (handwritten) </h2>
 

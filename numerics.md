@@ -1,8 +1,9 @@
 ---
-  layout: page
-  title: "Lecture Notes"
-  permalink: /numerics/
+layout: page
+title: "Numerical Examples"
 ---
+  
+
 
 <h2> Supplementary Numerical Examples </h2>
 All numerical examples were created in RMarkdown.  References to packages and data are presented whereever possible and links to the corresponding .Rmd files used to generate the examples are contained in the repository.  
