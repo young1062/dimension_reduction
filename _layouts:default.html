@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
 
+{% seo %}
   <body>
     <header class="page-header" role = "banner">
+      <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
+      <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline }}</h2>
       <a href="/dimension-reduction/">Home </a>
       <a href="/dimension-reduction/notes">Lecture Notes </a>
       <a href="/dimension-reduction/numerics">Numerical Examples </a>
