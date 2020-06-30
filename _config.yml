@@ -1,3 +1,5 @@
 theme: jekyll-theme-cayman
 title: "Introduction to Dimension Reduction"
 description: "A single semester course for upper level undergraduates"
+page-headers:
+  - default
