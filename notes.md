@@ -3,9 +3,7 @@ layout: page
 title: "Lecture Notes"
 ---
 
-<h2> Lecture Notes (handwritten) </h2>
-
-  The links below contain pdf files of the scanned lecture notes for all topics covered in the course. 
+The links below contain pdf files of the scanned lecture notes for all topics covered in the course. 
   
 <ul>
 <li> <a href="Linear\ Algebra\ and \ Multivariate\ Stats\ Review.pdf"> Linear algebra and Multivariate Stats Review </a></li>
