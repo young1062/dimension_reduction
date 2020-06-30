@@ -1,0 +1,543 @@
+---
+title: "Clustering"
+author: "Alex Young"
+date: "11/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+set.seed(1)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, cache = FALSE, fig.align = 'center')
+require(MASS)
+require(ggplot2)
+require(mclust)
+require(cluster)
+require(kernlab)
+require(scatterplot3d)
+require(gtools)
+require(mlbench)
+myColorRamp <- function(colors, values) {
+    v <- (values - min(values))/diff(range(values))
+    x <- colorRamp(colors)(v)
+    rgb(x[,1], x[,2], x[,3], maxColorValue = 255)
+}
+```
+
+##  {.tabset}
+
+Many clustering algorithms are built into R and thus do not require additional packages. Details for implementation of specific methods are discussed in the given tabs.
+
+### Agglomerative Hierarchical Clustering {.tabset}
+
+For hierarchical clustering, we can use the command *fit <- hclust(D, method = "method")* where *D* is a distance matrix and *"method"* specifies the method of agglomeration including "complete", "single", and "average" for single linkage, complete linkage, and average linkage respectively.  Given a hierarchial clustering, we can generate the dendogram using *plot(fit)*, find the groups at *cutree(fit,k= K)* where $K$ is the desired number of clusters, and add *red* boxes around these group to the dendogram using the command *rect.hclust(fit, k=K, border ="red")*.
+
+```{r, cache = TRUE}
+nci.data <- t(as.matrix( read.table(url("https://web.stanford.edu/~hastie/ElemStatLearn/datasets/nci.data.csv"),
+	sep=",",row.names=1,header=TRUE) ) )
+nci.label <- read.table(url("https://web.stanford.edu/~hastie/ElemStatLearn/datasets/nci.label"))
+row.names(nci.data) <- as.matrix(nci.label)
+```
+
+#### Izenman Examples
+
+The worked example from the Izenman text is shown below.
+
+```{r, cache = TRUE}
+X <- matrix(c(1,3,2,4,1,5,5,5,5,7,4,9,2,8,3,10), nrow = 8, byrow = TRUE)
+row.names(X) <- seq(1,8,1)
+par(mfrow = c(1,2))
+plot(X, cex = 0.1)
+text(X, labels =  row.names(X), col = "red")
+plot(hclust(dist(X), method = "average"), 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 1, main = "Average Linkage")
+plot(hclust(dist(X), method = "single"), 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 1, main = "Single Linkage")
+plot(hclust(dist(X), method = "complete"), 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 1, main = "Complete Linkage")
+
+
+```
+
+To assess the performance of the three linkage choices, we can compute the cophenetic correlation, measuring the strength of the association between the original pairwise distances between points and the heights at which they are merged into the same cluster. For the three linkage choices, the cophenetic correlations are 
+
+| Single Linkage | Average Linkage | Complete Linkage|
+|----------------|-----------------|-----------------|
+|`r round(cor(dist(X), cophenetic(hclust(dist(X), method = "single"  ))),2)`| `r round(cor(dist(X), cophenetic(hclust(dist(X), method = "average" ))),2)` |`r round(cor(dist(X), cophenetic(hclust(dist(X), method = "complete"))),2)` |
+
+indicating that average linkage mildy outperforms the other two methods.   
+
+
+To determine a suitable number of the clusters, we may also use the Mojena Tail Upper Tail Rule.  Plots of $(\alpha_j - \bar{\alpha})/s_\alpha$ are shown for the three clustering methods.
+
+```{r, cache = TRUE}
+ave.cls <- hclust(dist(X), method = "average"); #ave.cls$height <- c(0, ave.cls$height)
+sin.cls <- hclust(dist(X), method = "single"); #sin.cls$height <- c(0, sin.cls$height)
+com.cls <- hclust(dist(X), method = "complete"); #com.cls$height <- c(0, com.cls$height)
+df <- data.frame(  x = rep(seq(1,7,1),3),
+                   y = c((ave.cls$height - mean(ave.cls$height))/sd(ave.cls$height),
+                         (sin.cls$height - mean(sin.cls$height))/sd(sin.cls$height),
+                         (com.cls$height - mean(com.cls$height))/sd(com.cls$height)),
+                   Linkage = c(rep("average",7), rep("single",7), rep("complete",7))
+)
+ggplot(df, aes(x=x, y=y)) + geom_path(aes(color = Linkage)) +
+  xlab("Number of Merges") +
+  ylab("Mojena Coefficient")
+```
+
+#### NCI Data
+
+```{r, cache = TRUE}
+fit.sin <- hclust( dist(nci.data), method = "single" )
+fit.ave <- hclust( dist(nci.data), method = "average" )
+fit.com <- hclust( dist(nci.data), method = "complete" )
+par(mfrow = c(1,3))
+plot(fit.sin, cex = 0.5, xlab = "NCI Microarray Data", 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 0, main = "Single Linkage")
+
+plot(fit.ave, cex = 0.7, xlab = "NCI Microarray Data", 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 0, main = "Average Linkage")
+
+plot(fit.com, cex = 0.7, xlab = "NCI Microarray Data", 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 0, main = "Complete Linkage")
+```
+
+Again, for comparison of the methods, the cophenetic correlations are
+
+| Single Linkage | Average Linkage | Complete Linkage |
+|----------------|-----------------|------------------|
+|`r round(cor(dist(nci.data), cophenetic(fit.sin)),2)`|`r round(cor(dist(nci.data), cophenetic(fit.ave)),2)`|`r round(cor(dist(nci.data), cophenetic(fit.com)),2)`|
+
+Finally, to choose a cut from the hierarchical clustering algorithms we look at plots of $(\alpha_j -\bar{\alpha})/s_\alpha$
+
+```{r, cache = TRUE}
+# fit.sin$height <- c(0,fit.sin$height)
+# fit.ave$height <- c(0,fit.ave$height)
+# fit.com$height <- c(0,fit.com$height)
+df <- data.frame(  x = rep(seq(1,dim(nci.data)[1]-1,1),3),
+                   y = c( (fit.ave$height - mean(fit.ave$height))/sd(fit.ave$height),
+                          (fit.sin$height - mean(fit.com$height))/sd(fit.com$height),
+                          (fit.com$height - mean(fit.com$height))/sd(fit.com$height)),
+                   Linkage = c(rep("average",dim(nci.data)[1]-1), rep("single",dim(nci.data)[1]-1), rep("complete",dim(nci.data)[1]-1))
+)
+ggplot(df, aes(x=x, y=y)) + geom_path(aes(color = Linkage)) +
+  xlab("Number of Merges") +
+  ylab("Mojena Coefficient")
+
+```
+
+Unfortunately, these clustering results do not display a particular large jump at any point.  One could, perhaps, consider the complete linkage.  At the 61st merge, the Mojena coefficient is 2 suggesting one could choose a cut at $k=3$ shown below
+
+```{r, cache = TRUE}
+plot(fit.com, cex = 0.5, xlab = "NCI Microarray Data", 
+     sub = "", axes = TRUE, frame.plot = FALSE, ylab = "",
+     hang = 0, main = "Complete Linkage")
+rect.hclust(fit.com, k=3, border ="red")
+
+```
+
+
+
+### Center and Model-based Clustering {.tabset}
+
+*$k$-medoids clustering:* Use the command *out <- pam(data, K, metric = "euclidean")* to find a *K* cluster solution using $k$-medoids. The cluster labels are given in *out\$clustering*.  
+
+*$k$-means clustering:* Use the command *out <- kmeans(data, centers = K)* to find a *K* cluster solution using $k$-means.  The cluster labels are given in *out\$cluster*.
+
+*Gaussian mixtures:* Use the command *out <- Mclust(data, modelNames = name, G = K)* to find a *K* cluster solution using a Gaussian mixture model with $K$ component and covariance structure given by name.  To compare multiple models, use the command *out <- mclustBIC(data, G = , modelNames = )*.  Calling *plot(out)* shows the BIC curves for all methods and number of mixture components. Calling *summary(out)* gives the three best-performing methods and number of mixture component.  
+
+#### Distinct Mixture Components
+```{r, cache = TRUE}
+    N <- 100 
+    GM <- rbind(  mvrnorm(N, mu =  c(0,0,0), Sigma= diag(c(1,1,1)) ),
+              mvrnorm(N, mu =  c(3,3,3), Sigma= diag(c(1,1,1)) ),
+              mvrnorm(N, mu = -c(3,3,3), Sigma= diag(c(1,1,1)) )
+    )
+```
+
+Consider data generated from a mixture of 3 Gaussian distributions with means at $\vec{0}_3$ and $\pm (3,3,3)^T$ each with unit covariance shown below.
+
+```{r, cache = TRUE}
+scatterplot3d(GM, xlab = '', ylab = '', zlab = '',
+              color = c("red","blue","black")[c(rep(1,N),rep(2,N),rep(3,N))] )
+```
+
+```{r, cache = TRUE}
+ESS.med <- rep(NA, 15)
+for (j in 1:15){
+  ESS.med[j] <- pam(GM, k = j)$objective[2]
+}
+plot(ESS.med, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-medoids clustering")
+```
+
+```{r, cache = TRUE}
+ESS.means <- rep(NA, 15)
+for (j in 1:15){
+  ESS.means[j] <- kmeans(GM, centers = j)$tot.withinss
+}
+plot(ESS.means, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-means clustering")
+```
+
+
+```{r, message= FALSE, cache = TRUE}
+plot(mclustBIC(GM, G = 1:15), xlab = 'Number of Clusters', ylab = 'BIC', main = "Gaussian mixture model-based clustering")
+```
+
+#### Overlapping Mixture Components {.tabset}
+
+##### $d=3$
+```{r, cache = TRUE}
+    N <- 100 
+    d<- 3
+    mu <- rep(1,d)
+    GM <- rbind(  mvrnorm(N, mu =  rep(0,d), Sigma= diag(c(1,1,1)) ),
+              mvrnorm(N, mu =  mu, Sigma= diag(c(1,1,1)) ),
+              mvrnorm(N, mu = -mu, Sigma= diag(c(1,1,1)) )
+    )
+```
+
+Consider data generated from a mixture of 3 Gaussian distributions with means at $\vec{0}_3$ and $\pm (`r mu`)^T$ each with unit covariance shown below.
+
+
+```{r, cache = TRUE}
+scatterplot3d(GM, xlab = '', ylab = '', zlab = '',
+              color = c("red","blue","black")[c(rep(1,N),rep(2,N),rep(3,N))] )
+```
+
+Below we show plots of the objective function vs number of clusters for $k$-medoids and $k$-means clustering and the BIC for Gaussian mixture model-based clustering.
+
+
+```{r, cache = TRUE}
+ESS.med <- rep(NA, 15)
+for (j in 1:15){
+  ESS.med[j] <- pam(GM, k = j)$objective[2]
+}
+plot(ESS.med, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-medoids clustering")
+```
+
+```{r, cache = TRUE}
+ESS.means <- rep(NA, 15)
+for (j in 1:15){
+  ESS.means[j] <- kmeans(GM, centers = j)$tot.withinss
+}
+plot(ESS.means, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-means clustering")
+```
+
+
+```{r, message= FALSE, cache = TRUE}
+plot(mclustBIC(GM, G = 1:15), xlab = 'Number of Clusters', ylab = 'BIC', main = "Gaussian mixture model-based clustering")
+```
+
+##### $d=100$
+```{r, cache = TRUE}
+    N <- 100 
+    d <- 100
+    mu <- rep(1,d)
+    GM <- rbind(  mvrnorm(N, mu =  rep(0,d), Sigma= diag(rep(1,d)) ),
+              mvrnorm(N, mu =  mu, Sigma= diag(rep(1,d)) ),
+              mvrnorm(N, mu = -mu, Sigma= diag(rep(1,d)) )
+    )
+```
+
+Consider data generated from a mixture of 3 Gaussian distributions with means at $\vec{0}_{100}$ and $\pm \vec{1}_{100}$ each with unit covariance. Below we show plots of the objective function vs number of clusters for $k$-medoids and $k$-means clustering and the BIC for Gaussian mixture model-based clustering.
+
+
+```{r, cache = TRUE}
+ESS.med <- rep(NA, 15)
+for (j in 1:15){
+  ESS.med[j] <- pam(GM, k = j)$objective[2]
+}
+plot(ESS.med, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-medoids clustering")
+```
+
+```{r, cache = TRUE}
+ESS.means <- rep(NA, 15)
+for (j in 1:15){
+  ESS.means[j] <- kmeans(GM, centers = j)$tot.withinss
+}
+plot(ESS.means, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-means clustering")
+```
+
+
+```{r, message= FALSE, cache = TRUE}
+plot(mclustBIC(GM, G = 1:15), xlab = 'Number of Clusters', ylab = 'BIC', main = "Model-based clustering")
+```
+
+#### NCI Data
+
+Below we show plots of the objective function vs number of clusters for $k$-medoids and $k$-means clustering and the BIC for Gaussian mixture model-based clustering applied to the NCI cancer data.
+
+```{r, cache = TRUE}
+ESS.med <- rep(NA, 15)
+for (j in 1:15){
+  ESS.med[j] <- pam(nci.data, k = j)$objective[2]
+}
+plot(ESS.med, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-medoids clustering")
+```
+
+```{r, cache = TRUE}
+ESS.means <- rep(NA, 15)
+for (j in 1:15){
+  ESS.means[j] <- kmeans(nci.data, centers = j)$tot.withinss
+}
+plot(ESS.means, xlab = 'Number of Clusters', ylab = 'Objective Function', main = "k-means clustering")
+```
+
+
+```{r, message= FALSE, cache = TRUE}
+plot(mclustBIC(nci.data, G = 1:15), xlab = 'Number of Clusters', ylab = 'BIC', main = "Model-based clustering")
+```
+
+
+
+### Spectral Clustering {.tabset}
+
+*Spectral clustering:* Use the command *out <- specc(data, centers = K)* to find a *K* cluster solution using spectral clustering.  The algorithm defaults to a radial basis function with adaptively determined width parameter given in *out\@kernelf\@kpar*.  The cluster labels are given in  *out\@.Data*.
+
+
+#### Spiral
+
+
+Consider the spiral shaped data in $\mathbb{R}^2$ comprised of two arms shown below.  
+
+```{r, fig.height = 4, fig.width=4, fig.align = 'center', cache = TRUE}
+data("spirals")
+spirals[ permute(1:dim(spirals)[1]), ] <- spirals
+plot(spirals, xlab = '', ylab ='')
+```
+
+It is natural to consider the two arms as separate clusters.  However, *k*-means, *k*-medoids, and model-based clustering give very similar results which all fail to capture this structure. This is driven largely by the objective functions for these methods which prefer to cluster points in convex regions.
+
+```{r, fig.height = 2.5, cache = TRUE}
+par(mfrow = c(1,3))
+plot(spirals, xlab = '', ylab = '', main = 'k-medoids',
+     col = c("red","blue")[pam(spirals, k = 2)$cluster])
+plot(spirals, xlab = '', ylab = '', main = 'k-means',
+     col = c("red","blue")[kmeans(spirals, centers = 2)$cluster])
+plot(spirals, xlab = '', ylab = '', main = 'model-based, EII',
+     col = c("red","blue")[Mclust(spirals, G = 2, modelNames = "EII")$classification])
+
+```
+
+Agglomerative nesting through single, average, and complete linkage also fail to partition the two arms of the spiral.
+
+
+```{r, fig.height = 2.5, cache = TRUE}
+par(mfrow = c(1,3))
+plot(spirals, xlab = '', ylab = '', main = 'Single-linkage',
+     col = c("red","blue")[cutree(hclust(dist(spirals), method = "single"),k=2)])
+plot(spirals, xlab = '', ylab = '', main = 'Average-linkage',
+     col = c("red","blue")[cutree(hclust(dist(spirals), method = "average"),k=2)])
+plot(spirals, xlab = '', ylab = '', main = 'Complete-linkage',
+     col = c("red","blue")[cutree(hclust(dist(spirals), method = "complete"),k=2)])
+
+```
+
+
+```{r, cache = TRUE}
+spiral.spec <- specc(spirals, centers = 2)
+plot(spirals, xlab = '', ylab = '', main = 'Spectral Clustering',
+     col = c("red","blue")[spiral.spec@.Data])
+```
+
+
+
+##### Affinity Matrix, Graph Laplacian, and Eigenvectors
+
+```{r}
+# sig <- 1/spiral.spec@kernelf@kpar$sigma
+sig <- spiral.spec@kernelf@kpar$sigma
+# sig <- 1/(2*spiral.spec@kernelf@kpar$sigma^2)
+A <- exp(- sig * as.matrix(dist(spirals)^2) ); diag(A) <- 0
+
+# delete non-nearest neighbors
+# k <- 3
+# for (j in 1:dim(A)[1]){
+#   A[j, which(A[j,] > sort(A[j,])[k]) ] <- 0
+# }
+
+Deg <- as.vector(A %*% matrix(1,nrow = dim(spirals)[1], ncol = 1)) 
+
+# unnormalized 
+L <- diag( Deg ) - A
+
+# symmetric normalized
+# L <- diag(rep(1,dim(spirals)[1])) - diag(Deg^(-1/2)) %*% A %*% diag(Deg^(-1/2))
+
+# RW normalized
+# L <- diag(rep(1,dim(spirals)[1])) - diag(D^(-1)) %*% A
+
+Aperm <- 0*A; 
+for (j in 1:2){
+  for (k in 1:2){
+      Aperm[((j-1)*150+1):(j*150), ((k-1)*150+1):(k*150)] <- A[which(spiral.spec@.Data == j), which(spiral.spec@.Data == k )]
+  }
+}
+Lperm <- diag( as.vector(Aperm %*% matrix(1,nrow = dim(spirals)[1], ncol = 1)) ) - Aperm
+
+
+par(mfrow = c(2,2))
+image(x = seq(1,dim(spirals)[1],1), y = seq(1,dim(spirals)[1],1), z = A[,dim(spirals)[1]:1],
+      xlab = '', ylab = '', main = "Affinity Matrix", xaxt = 'n', yaxt = 'n'
+)
+image(x = seq(1,dim(spirals)[1],1), y = seq(1,dim(spirals)[1],1), z = L[,dim(spirals)[1]:1],
+      xlab = '', ylab = '', main = "Graph Laplacian", xaxt = 'n', yaxt = 'n'
+)
+image(x = seq(1,dim(spirals)[1],1), y = seq(1,dim(spirals)[1],1), z = Aperm[,dim(spirals)[1]:1],
+      xlab = '', ylab = '', main = "Permuted Affinity Matrix", xaxt = 'n', yaxt = 'n'
+)
+image(x = seq(1,dim(spirals)[1],1), y = seq(1,dim(spirals)[1],1), z = Lperm[,dim(spirals)[1]:1],
+      xlab = '', ylab = '', main = "Permuted Graph Laplacian", xaxt = 'n', yaxt = 'n'
+)
+```
+
+
+```{r}
+plot(log(sort(svd(L)$d)[1:10]), ylab = "log Eigenvalues" )
+```
+
+```{r}
+L.ev <- svd(L)
+# normalize Y[,1:2] eigenvectors by row
+for (j in 1:dim(spirals)[1]){
+  L.ev$u[j,] <- L.ev$u[j,]/sqrt(sum(L.ev$u[j,(dim(spirals)[1]-2):(dim(spirals)[1]-1)]^2))
+}
+plot(L.ev$u[,dim(spirals)[1]-1],L.ev$u[,dim(spirals)[1]-2], col = c("red","blue")[spiral.spec@.Data],
+     xlab = "2nd Eigenvector", ylab = "Third Eigenvector")
+```
+
+```{r}
+spiral.spec.manual <- kmeans(L.ev$u[,(dim(spirals)[1] -2):(dim(spirals)[1]-1)], centers = 2)
+plot(spirals, col = c("red","blue")[spiral.spec.manual$cluster],
+     xlab = '', ylab = '')
+```
+
+
+#### Concentric Rings
+
+Consider the data in $\mathbb{R}^2$ comprised of 3 concentric rings shown below.  
+
+```{r, fig.height = 4, fig.width=4, fig.align = 'center', cache = TRUE} 
+N <- 250
+theta <- runif(3*N, min = 0, max = 2*pi); 
+r = c(runif(N, min = 0.9,max = 1.1),runif(N, min = 1.9,max = 2.1),runif(N, min = 2.9,max = 3.1) )
+rings <-  cbind(cos(theta),sin(theta)) * cbind(r,r)
+# rings[ permute(1:(3*N)), ] <- rings
+# plot(rings, xlab = '', ylab = '',
+#      col = c("red","blue","black")[c(rep(1,N),rep(2,N),rep(3,N))])
+plot(rings, xlab = '', ylab = '')
+```
+
+It is natural to consider the three rings as separate clusters.  However, like the spirals case *k*-means, *k*-medoids, and model-based clustering give very similar results which all fail to capture this structure. Again, this is driven largely by the objective functions for these methods which prefer to cluster points in convex regions which results in the splitting of the disk into thirds.
+
+```{r, fig.height = 2.5, cache = TRUE}
+par(mfrow = c(1,3))
+plot(rings, xlab = '', ylab = '', main = 'k-medoids',
+     col = c("red","blue","black")[pam(rings, k = 3)$cluster])
+plot(rings, xlab = '', ylab = '', main = 'k-means',
+     col = c("red","blue","black")[kmeans(rings, centers = 3)$cluster])
+plot(rings, xlab = '', ylab = '', main = 'model-based, EII',
+     col = c("red","blue","black")[Mclust(rings, G = 3, modelNames = "EII")$classification])
+
+```
+
+Agglomerative nesting through average and complete linkage also fail to partition the three rings of the spiral.  Single-linkage, largely driven by its proclivity to chain nearby structure together, does capture the concentric rings.
+
+
+```{r, fig.height = 2.5, cache = TRUE}
+par(mfrow = c(1,3))
+plot(rings, xlab = '', ylab = '', main = 'Single-linkage',
+     col = c("red","blue","black")[cutree(hclust(dist(rings), method = "single"),k=3)])
+plot(rings, xlab = '', ylab = '', main = 'Average-linkage',
+     col = c("red","blue","black")[cutree(hclust(dist(rings), method = "average"),k=3)])
+plot(rings, xlab = '', ylab = '', main = 'Complete-linkage',
+     col = c("red","blue","black")[cutree(hclust(dist(rings), method = "complete"),k=3)])
+
+```
+
+```{r, cache = TRUE}
+rings.spec <- specc(rings, centers = 3)
+plot(rings, xlab = '', ylab = '', main = 'Spectral Clustering',
+     col = c("red","blue","black")[rings.spec@.Data])
+```
+
+
+##### Affinity Matrix, Graph Laplacian, and Eigenvectors
+
+```{r}
+
+sig <- rings.spec@kernelf@kpar$sigma
+A.rings <- exp(-  sig *as.matrix(dist(rings)^2) ); #diag(A.rings) <- 0
+
+# delete non-nearest neighbors
+# k <- 3
+# for (j in 1:dim(A.rings)[1]){
+#   A.rings[j, which(A.rings[j,] > sort(A.rings[j,])[k])] <- 0
+# }
+
+Deg <- as.vector(A.rings %*% matrix(1,nrow = dim(rings)[1], ncol = 1))
+
+# unnormalized graph Laplacian
+L.rings <- diag( Deg ) - A.rings
+
+# symmetric normalized graph Laplacian
+# L.rings <- diag(rep(1,dim(rings)[1] )) - diag(Deg^{-1/2}) %*% A.rings %*% diag(Deg^{-1/2})
+
+# RW normalized graph Laplacian
+# L.rings <- diag(rep(1,dim(rings)[1] )) - diag(Deg^{-1}) %*% A.rings
+ 
+par(mfrow = c(1,2))
+im <- image(x = seq(1,dim(rings)[1],1), y = seq(1,dim(rings)[1],1), z = A.rings[,dim(rings)[1]:1],
+      xlab = '', ylab = '', main = "Affinity Matrix"
+)
+im <- image(x = seq(1,dim(rings)[1],1), y = seq(1,dim(rings)[1],1), z = L.rings[,dim(rings)[1]:1],
+      xlab = '', ylab = '', main = "Graph Laplacian"
+)
+```
+
+```{r}
+L.rings.ev <- svd(L.rings)
+plot(1:10,sort(L.rings.ev$d)[1:10], main = "Eigenvalues of L", xlab = "Index", ylab = "Eigenvalue" )
+```
+
+```{r}
+sc <- 1.1
+for (j in 1:dim(rings)[1]){
+  L.rings.ev$u[j,] <- L.rings.ev$u[j,]/sqrt(sum(L.rings.ev$u[j,(dim(rings)[1]-3):(dim(rings)[1]-1)]^2))
+}
+scatterplot3d(x = L.rings.ev$u[,(3*N-1)], 
+              y = L.rings.ev$u[,(3*N-2)], 
+              z = L.rings.ev$u[,(3*N-3)], 
+              xlab = '2nd Eigenvector', ylab = '3rd Eigenvector', zlab = '4th Eigenvector',
+                    color = c("blue","red","black")[rings.spec@.Data], cex.symbols = 0.5,
+                    xlim = c(-sc,sc), ylim = c(-sc,sc), zlim = c(-sc,sc), angle = 75)
+# image(x = 1:3, y = 1:dim(rings)[1], z = t(Re(L.rings.ev$vectors[,(3*N-3):(3*N-1)])), xaxt = 'n', yaxt = 'n')
+```
+
+
+```{r}
+rings.spec.manual <- kmeans(L.rings.ev$u[,(3*N-3):(3*N-1)], centers = 3)
+# for (n in 2:25){
+#   temp <- kmeans(L.rings.ev$u[,(3*N-3):(3*N-1)], centers = 3)
+#   if (temp$betweenss > rings.spec.manual$betweenss){ rings.spec.manual <- temp}
+# }
+plot(rings, col = c("red","blue","black")[rings.spec.manual$cluster],
+     xlab = '', ylab = '')
+```
+
+
+
+#### Cassini Data
+
+Write your own script to compute the affinity matrix, graph Laplacian, and Spectral Clustering for the Cassini data shown below.
+
+```{r}
+cassini <- mlbench.cassini(500)
+plot(cassini)
+
+```

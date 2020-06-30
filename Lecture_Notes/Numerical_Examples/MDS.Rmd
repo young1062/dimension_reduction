@@ -1,0 +1,376 @@
+---
+title: "Multidimensional Scaling (MDS) Examples"
+author: "Statistics 185"
+date: "10/10/2019"
+output: html_document
+
+---
+
+```{r setup, include=FALSE, echo = FALSE, message = FALSE}
+require("scatterplot3d")
+knitr::opts_chunk$set(echo = FALSE)
+library('MASS')
+library('maps')
+library("gdata")
+```
+
+
+
+# {.tabset}
+
+This document contains two examples Multidimensional Scaling: one on metric MDS and a second on nonmetric MDS.  
+
+## Metric MDS {.tabset}
+
+### US cities
+
+The *eurodist* R package provides road distance between 21 cities in Europe and 9 cities in the US.  For the moment, we will focus on the 10 US cities with names and distances given in the following table
+```{r, echo = FALSE}
+UScitiesD
+```
+
+The goal of MDS is to to reconstruct the configuration of $n$ points, in this case cities, using information about the distances between them.  
+```{r, echo = FALSE}
+city.loc <- cmdscale(UScitiesD, k =2);
+plot(city.loc, type = 'n', 
+     xlab = 'Dimension 1',
+     ylab = 'Dimension 2')
+text(city.loc, labels = attr(UScitiesD, "Labels"),
+     cex = 0.75)
+```
+
+If we rotate this image 180 degrees we see a map which aligns with the map of the US
+```{r, echo = FALSE}
+# city.loc.rot <- city.loc %*% matrix(c(0,-1,-1,0), nrow = 2) 
+city.loc.rot <- -city.loc
+# par(mar = c(1,1,1,1))
+# par(mfrow = c(2,1))
+plot(city.loc.rot, type = 'n', 
+     xlab = 'Dimension 1',
+     ylab = 'Dimension 2')
+text(city.loc.rot, labels = attr(UScitiesD, "Labels"),
+     cex = 0.75)
+# map("state")
+```
+
+### European cities
+
+We can also consider a collection of 21 European cities
+```{r}
+eurodist
+```
+A 2-dimensional reconstruction using MDS gives the map
+```{r, echo = FALSE}
+city.loc <- cmdscale(eurodist)
+plot(city.loc, type = 'n', 
+     xlab = 'Dimension 1',
+     ylab = 'Dimension 2')
+text(city.loc, labels = attr(eurodist, "Labels"),
+     cex = 0.75)
+```
+
+which again, has a different orientation than the traditional perspective take in the US/Europe.  Flipping the second dimension gives
+```{r, echo = FALSE}
+city.loc.flip <- city.loc %*% matrix(c(1,0,0,-1),nrow = 2)
+plot(city.loc.flip, type = 'n', 
+     xlab = 'Dimension 1',
+     ylab = 'Dimension 2')
+text(city.loc.flip, labels = attr(eurodist, "Labels"),
+     cex = 0.75)
+```
+
+### Global cities
+
+Distances, given by length of flights from one city the next (geodesic or great circle distance), are shown for a set of 18 cities from around the globe.
+
+```{r, echo = FALSE}
+D <- matrix(0, 18,18)
+row.names(D) <- names <- c("Beijing","Cape Town","Hong Kong", "Honolulu", "London", "Melbourne", 
+                  "Mexico City", "Montreal", "Moscow", "New Delhi", "New York", "Paris",
+                  "Rio", "Rome", "S.F.", "Singapore", "Stockholm", "Tokyo")
+colnames(D) <- names
+
+D[2:18,  1] <- c(12947, 1972, 8171, 8160, 9093, 12478, 10490, 5809, 2788, 11012, 8236, 17325, 8144, 9524, 4465, 6725, 2104)
+D[3:18,  2] <- c(11867, 18562, 9635, 10388, 13703, 12744, 10101, 9284, 12551, 9307, 6075, 8417, 16487, 9671, 10334, 14737)
+D[4:18,  3] <- c(8945, 9646, 7392, 14155, 12462, 7158, 3770, 12984, 9650, 17710, 9300, 11121, 2575, 8243, 2893)
+D[5:18,  4] <- c(11653, 8862, 6098, 7915, 11342, 11930, 7996, 11988, 13343, 12936, 3857, 10824, 11059, 6208)
+D[6:18,  5] <- c(16902, 8947, 5240, 2506, 6724, 5586, 341, 9254, 1434, 8640, 10860, 1436, 9585)
+D[7:18,  6] <- c(13557, 16730, 14418, 10192, 16671, 16793, 13227, 15987, 12644, 6050, 15593, 8159)
+D[8:18,  7] <- c(3728, 10740, 14679, 3362, 9213, 7669, 10260, 3038, 16623, 9603, 11319)
+D[9:18,  8] <- c(7077, 11286, 533, 5522, 8175, 6601, 4092, 14816, 5900, 10409)
+D[10:18, 9] <- c(4349, 7530, 2492, 11529, 2378, 9469, 8426, 1231, 7502)
+D[11:18, 10] <- c(11779, 6601, 14080, 5929, 12380, 4142, 5579, 5857)
+D[12:18, 11] <- c(5851, 7729, 6907, 4140, 15349, 6336, 10870)
+D[13:18, 12] <- c(9146, 1108, 8975, 10743, 1546, 9738)
+D[14:18, 13] <- c(9181, 10647, 15740, 10682, 18557)
+D[15:18, 14] <- c(10071, 10030, 1977, 9881)
+D[16:18, 15] <- c(13598, 8644, 8284)
+D[17:18, 16] <- c(9646, 5317)
+D[18:18, 17] <- 8193
+
+D <- D + t(D)
+
+D
+```
+
+The classical scaling MDS is computed from these distances for dimensions $k=1,\dots,4$.  The eigenvalues from the inner product matrix are shown below.  
+```{r, echo = FALSE}
+MDS1 <- cmdscale(D,k=1, eig = TRUE, x.ret = TRUE)
+MDS2 <- cmdscale(D,k=2, eig = TRUE, x.ret = TRUE)
+MDS3 <- cmdscale(D,k=3, eig = TRUE, x.ret = TRUE)
+MDS4 <- cmdscale(D,k=4, eig = TRUE, x.ret = TRUE)
+distances1 <- distances2 <- distances3 <- distances4 <- matrix(0,18,18)
+for (s in 2:18){
+  for (t in 1:(s-1)){
+    distances1[s,t] <- (MDS1$points[s] - MDS1$points[t])^2
+    distances2[s,t] <- t(MDS2$points[s,] - MDS2$points[t,]) %*% (MDS2$points[s,] - MDS2$points[t,])
+    distances3[s,t] <- t(MDS3$points[s,] - MDS3$points[t,]) %*% (MDS3$points[s,] - MDS3$points[t,])
+    distances4[s,t] <- t(MDS4$points[s,] - MDS4$points[t,]) %*% (MDS4$points[s,] - MDS4$points[t,])
+  }
+}
+```
+
+```{r, echo = FALSE}
+# par(mfrow = c(1,4))
+# plot(MDS1$eig, xlab = 'k', ylab = expression(lambda[k]))
+# plot(MDS2$eig, xlab = 'k', ylab = expression(lambda[k]))
+# plot(MDS3$eig, xlab = 'k', ylab = expression(lambda[k]))
+plot(MDS4$eig, xlab = 'k', ylab = expression(lambda[k]))
+```
+
+Note the presence of negative eigenvalues, which are not surprising since the distances between cities are non-Euclidean!  Importantly, the eigenvalues are small in magnitude for $k>3$ suggesting a 3-dimensional representation of a the data is suitable.  This is also apparent when the distance of the $k$-dimensional solution to the classical MDS is plotted against the original distances for $k=1,2,3,4.$  Below, the plots from the 3 and 4 dimensional representation are nearly identical.
+
+Finally, we can compare the
+
+```{r, echo = FALSE}
+
+par(mfrow = c(1,4))
+
+plot(distances1[lower.tri(distances1, diag = FALSE)], D[lower.tri(D, diag = FALSE)],
+     xlab = "MDS Distances", ylab = "Observed Distances"
+)
+plot(distances2[lower.tri(distances1, diag = FALSE)], D[lower.tri(D, diag = FALSE)],
+     xlab = "MDS Distances", ylab = "Observed Distances"
+)
+plot(distances3[lower.tri(distances1, diag = FALSE)], D[lower.tri(D, diag = FALSE)],
+     xlab = "MDS Distances", ylab = "Observed Distances"
+)
+
+plot(distances4[lower.tri(distances1, diag = FALSE)], D[lower.tri(D, diag = FALSE)],
+     xlab = "MDS Distances", ylab = "Observed Distances"
+)
+
+```
+
+Finally, we conclude with a rendering of the classical solution in $3$ dimensions shown below.  Although this image is rotated from our usual perspective, it still reflects, approximately, the orientation of cities one the globe.
+
+```{r,echo = FALSE, webgl=TRUE}
+fig <- scatterplot3d(MDS3$points[,1:3],
+                  xlab = "", ylab = "", zlab = "", 
+                  tick.marks = FALSE, label.tick.marks = FALSE,
+                  grid = FALSE, box = TRUE)
+text(fig$xyz.convert(MDS3$points[,1:3]),labels= rownames(MDS3$points), pos=1) 
+```
+
+
+### Metris Least Squares MDS
+
+Consider the collection of 100 points in $\mathbb{R}^2$
+
+```{r, echo = FALSE}
+N <- 100
+group <- rep(0,N)
+group[runif(N, min = 0, max = 1) <1/2 ] <- 3
+X <- matrix(0,nrow = N, ncol = 2)
+for (n in 1:N){
+  X[n,] <- mvrnorm(n=1, mu = c(0,group[n]), Sigma = matrix(c(0.1,0,0,0.1),nrow = 2))
+}
+plot(X, xlab = '', ylab = '',
+     xlim = c(-3,3), ylim = c(-1,4))
+
+dist.X1 <- dist.X2 <- dist.Xinf <- matrix(0,N,N)
+for (m in 2:N){
+  for(n in 1:(m-1)){
+    dist.X1[m,n] <- sum(abs(X[m,]- X[n,])) # euclidean dist
+    dist.X2[m,n] <- sqrt(sum((X[m,]- X[n,])^2)) # euclidean dist
+    dist.Xinf[m,n] <- max(abs(X[m,]-X[n,]))
+  }
+}
+dist.X1   <- dist.X1 + t(dist.X1)
+dist.X2   <- dist.X2 + t(dist.X2)
+dist.Xinf <- dist.Xinf + t(dist.Xinf)
+```
+
+Let's compute a one-dimensional representation of the data using metric MDS Sammon Scaling vs. Classical Scaling
+
+```{r,echo = FALSE}
+
+SAM <- sammon(dist.X2, k=1, trace = FALSE)
+CLA <- cmdscale(dist.X2, k=1)
+SAM.dist <- CLA.dist <- matrix(0,N,N)
+for (m in 2:N){
+  for(n in 1:(m-1)){
+    SAM.dist[m,n] <- abs(SAM$points[m]-SAM$points[n])
+    CLA.dist[m,n] <- abs(CLA[m]-CLA[n])
+  }
+}
+
+
+par(mfrow = c(2,2))
+plot(dist.X1[lower.tri(dist.X1, diag = FALSE)], SAM.dist[lower.tri(dist.X1, diag = FALSE)], 
+     main = "Sammon's Mapping",
+     xlab = "Original Dissimilarity",
+     ylab = "Sammon Distance")
+plot(dist.X1[lower.tri(dist.X1, diag = FALSE)], CLA.dist[lower.tri(dist.X1, diag = FALSE)], 
+     main = "Classical Scaling",
+     xlab = "Original Dissimilarity",
+     ylab = "Classical Scaling Distance")
+
+plot(dist.X1[lower.tri(dist.X1, diag = FALSE)], SAM.dist[lower.tri(dist.X1, diag = FALSE)]-dist.X1[lower.tri(dist.X1, diag = FALSE)], 
+     main = "Classical Scaling",
+     xlab = "Original Dissimilarity",
+     ylab = "Residual",
+     ylim = c(-1.5,1))
+plot(dist.X1[lower.tri(dist.X1, diag = FALSE)], CLA.dist[lower.tri(dist.X1, diag = FALSE)]-dist.X1[lower.tri(dist.X1, diag = FALSE)], 
+     main = "Classical Scaling",
+     xlab = "Original Dissimilarity",
+     ylab = "Residual",
+     ylim = c(-1.5,1))
+```
+
+And the same figures for the Global Cities from earlier
+
+```{r, echo = FALSE}
+SAM.cities1 <- sammon(D, k=1,trace = FALSE)
+SAM.cities2 <- sammon(D, k=2,trace = FALSE)
+SAM.cities3 <- sammon(D, k=3,trace = FALSE)
+SAM.dist1 <- SAM.dist2 <- SAM.dist3 <- matrix(0,18,18)
+for (s in 2:18){
+  for (t in 1:(s-1)){
+    SAM.dist1[s,t] <- (SAM.cities1$points[s] - SAM.cities1$points[t])^2
+    SAM.dist2[s,t] <- t(SAM.cities2$points[s,] - SAM.cities2$points[t,]) %*% (SAM.cities2$points[s,] - SAM.cities2$points[t,])
+    SAM.dist3[s,t] <- t(SAM.cities3$points[s,] - SAM.cities3$points[t,]) %*% (SAM.cities3$points[s,] - SAM.cities3$points[t,])
+  }
+}
+par(mfrow = c(2,3))
+plot(D[lower.tri(D, diag = FALSE)], SAM.dist1[lower.tri(D, diag = FALSE)], 
+     main = "1-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Sammon Distance")
+plot(D[lower.tri(D, diag = FALSE)], SAM.dist2[lower.tri(D, diag = FALSE)], 
+     main = "2-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Sammon Distance")
+plot(D[lower.tri(D, diag = FALSE)], SAM.dist3[lower.tri(D, diag = FALSE)], 
+     main = "3-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Sammon Distance")
+plot(D[lower.tri(D, diag = FALSE)], distances1[lower.tri(D, diag = FALSE)], 
+     main = "1-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Classical Scaling  Distance")
+plot(D[lower.tri(D, diag = FALSE)], distances2[lower.tri(D, diag = FALSE)], 
+     main = "2-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Classical Scaling  Distance")
+plot(D[lower.tri(D, diag = FALSE)], distances3[lower.tri(D, diag = FALSE)], 
+     main = "3-dimension",
+     xlab = "Original Dissimilarity",
+     ylab = "Classical Scaling Distance")
+```
+
+
+Finally, we can compare the stress at dimensions $k=1,\dots,9$, shown below.
+
+```{r, echo = FALSE}
+STRESS <- rep(0,9)
+for (j in 1:9){
+  STRESS[j] <- sammon(D, k = j, niter = 250,trace = FALSE)$stress
+}
+plot(STRESS, xlab = "Dimension", ylab = "Sammon Stress")
+```
+
+
+Interestingly, this metric MDS using Sammon distance shows an elbow at $k=2$ but the Sammon Stress has saturated near a small value for $k\ge 3$ dimensions.  For comparison, the two-dimensional metric MDS representation of the cities (shown below) preserves the grouping of cities by continent.
+
+```{r, echo = FALSE}
+plot(SAM.cities2$points, type = 'n', 
+     xlab = 'Dimension 1',
+     ylab = 'Dimension 2')
+text(SAM.cities2$points, labels = names,
+     cex = 0.75)
+```
+
+The 3-dimensional metric MDS allow preserves groupings by continent but also looks more like a traditional globe (albeit upside down from our usual representation).  This result is similar but distinct from the classical MDS (compare the positions of Cape Town and Melbourne in the two cases).
+```{r}
+fig <- scatterplot3d(SAM.cities3$points[,1:3],
+                  xlab = "", ylab = "", zlab = "", 
+                  tick.marks = FALSE, label.tick.marks = FALSE,
+                  grid = FALSE, box = TRUE)
+text(fig$xyz.convert(SAM.cities3$points[,1:3]),labels= rownames(SAM.cities3$points), pos=1)
+```
+
+## Nonmetric MDS
+
+As an example of nonmetric MDS, we will replicate the color circle results from Izenman. In the experiment, 14 colors were taken from the color wheel and 31 participants were asked to evaluate each pair of colors on a five-poiint scale from 0(no similarity) to 4(identical).  The rating for each pair was averaged over all subjects and divided by 4 to give *similarity* ratings in the interval 0 to 1 shown below.  Entries along the diagonal should be ignored.
+
+```{r, echo = FALSE}
+colors <- matrix(NA,14,14 )
+colors[1,]  <- c(0,	    0.86,	0.42,	0.42,	0.18,	0.06,	0.07,	0.04,	0.02,	0.07,	0.09,	0.12,	0.13,	0.16)
+colors[2,]  <- c(0.86,	   0,	 0.5,	0.44,	0.22,	0.09,	0.07,	0.07,	0.02,	0.04,	0.07,	0.11,	0.13,	0.14)
+colors[3,]  <- c(0.42,	 0.5,	   0,	0.81,	0.47,	0.17,	 0.1,	0.08,	0.02,	0.01,	0.02,	0.01,	0.05,	0.03)
+colors[4,]  <- c(0.42,	0.44,	0.81,	   0,	0.54,	0.25,	 0.1,	0.09,	0.02,	0.01,	   0,	0.01,	0.02,	0.04)
+colors[5,]  <- c(0.18,	0.22,	0.47,	0.54,	   0,	0.61,	0.31,	0.26,	0.07,	0.02,	0.02,	0.01,	0.02,	0)
+colors[6,]  <- c(0.06,	0.09,	0.17,	0.25,	0.61,	   0,	0.62,	0.45,	0.14,	0.08,	0.02,	0.02,	0.02,	0.01)
+colors[7,]  <- c(0.07,	0.07,	 0.1,	 0.1,	0.31,	0.62,	   0,	0.73,	0.22,	0.14,	0.05,	0.02,	0.02,	0)
+colors[8,]  <- c(0.04,	0.07,	0.08,	0.09,	0.26,	0.45,	0.73,	   0,	0.33,	0.19,	0.04,	0.03,	0.02,	0.02)
+colors[9,]  <- c(0.02,	0.02,	0.02,	0.02,	0.07,	0.14,	0.22,	0.33,	   0,	0.58,	0.37,	0.27,	 0.2,	0.23)
+colors[10,] <- c(0.07,	0.04,	0.01,	0.01,	0.02,	0.08,	0.14,	0.19,	0.58,	   0,	0.74,	 0.5,	0.41,	0.28)
+colors[11,] <- c(0.09,	0.07,	0.02,	   0,	0.02,	0.02,	0.05,	0.04,	0.37,	0.74,  	 0,	0.76,	0.62,	0.55)
+colors[12,] <- c(0.12,	0.11,	0.01,	0.01,	0.01,	0.02,	0.02,	0.03,	0.27,	 0.5,	0.76,	   0,	0.85,	0.68)
+colors[13,] <- c(0.13,	0.13,	0.05,	0.02,	0.02,	0.02,	0.02,	0.02,	0.2,	0.41,	0.62,	0.85,	   0,	0.76)
+colors[14,] <- c(0.16,	0.14,	0.03,	0.04,	   0,	0.01,	   0,	0.02,	0.23,	0.28,	0.55,	0.68,	0.76,	0)
+# colors <- read.csv("~/Downloads/color.stimuli.csv")
+names <- c("indigo","indigo-blue", "blue","blue", "blue-green",
+                                           "green","green-yellow","yellow","yellow-orange","orange",
+                                           "orange","red","red","red")
+row.names(colors) <- colnames(colors) <- names
+print(colors)
+```
+
+We can then convert the above scores to dissimilarities through the formula *dissimilarity = 1- similarity* for all non-diagonal entries to attain the dissimilarity matrix.
+
+
+```{r,echo = FALSE}
+
+colors[lower.tri(colors,diag = FALSE) ] <- 1- colors[lower.tri(colors,diag = FALSE) ] 
+colors[upper.tri(colors,diag = FALSE) ] <- 1- colors[upper.tri(colors,diag = FALSE) ] 
+print(colors)
+
+```
+
+
+We can now conduct nonmetric MDS using this dissimilarity matrix.  The stress at dimensions 1-10 is shown below.
+
+```{r,echo = FALSE}
+STRESS <- rep(0,10)
+for (j in 1:10){
+  Color.nmMDS <- isoMDS(as.dist(colors), k=j, maxit = 100,p= 2, trace = FALSE)
+  STRESS[j] <- Color.nmMDS$stress
+}
+plot(STRESS, xlab = "Dimension", ylab = "Kruskal Stress")
+```
+
+There is a clear drop in stress after 2 dimensions. If we plot the points in a two-dimensional configuration, we see the points organized in a manner similar to the standard color circle.  We have deleted some of the color names to improve legibility.
+
+```{r, echo = FALSE}
+Color.KrMDS <- isoMDS(as.dist(colors),
+                      k=2,p=1, trace = FALSE, maxit = 500)
+Color.nmMDS <- Shepard(as.dist(colors), Color.KrMDS$points,p = 2)
+plot(Color.KrMDS$points[,1:2]  , cex = 0.1, xlim = c(-1,1), ylim = c(-1,1),
+     xlab = "", ylab = "")
+lines(Color.KrMDS$points[,1:2])
+names[c(2,3,7,10,12,14)] <- ""
+text(Color.KrMDS$points[,1:2] , labels = names,
+     cex = 0.75)
+```
