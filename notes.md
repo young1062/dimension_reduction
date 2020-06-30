@@ -1,8 +1,3 @@
----
-layout: page
-title: "Lecture Notes"
----
-
 The links below contain pdf files of the scanned lecture notes for all topics covered in the course. 
   
 <ul>
