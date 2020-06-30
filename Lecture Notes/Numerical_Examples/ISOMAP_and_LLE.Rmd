@@ -1,0 +1,208 @@
+---
+title: "Nonlinear Manifold Learning: ISOMAP and LLE"
+author: "Alex Young"
+date: "10/29/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+set.seed(1) # for reproducibility
+require("dimRed")
+require("energy")
+require("scatterplot3d")
+require("rgl")
+require("plotly")
+# 
+myColorRamp <- function(colors, values) {
+    v <- (values - min(values))/diff(range(values))
+    x <- colorRamp(colors)(v)
+    rgb(x[,1], x[,2], x[,3], maxColorValue = 255)
+}
+
+# generate helix data
+t <- sort(runif(500, min = 0, max = 15))
+helix <- matrix(NA,nrow = length(t), ncol = 3)
+for (n in 1:length(t)){
+  helix[n,] <- c( cos(t[n]), sin(t[n]) , t[n])
+}
+
+# generate Swiss-shaped data
+S <- rep(0,2000)
+Swiss <- matrix(NA, nrow = 2000, ncol = 3)
+for( n in 1:2000){
+    s <- runif(1, min = 3*pi/2, max = 9*pi/2)
+    t <- runif(1, min = 0,      max = 15)
+    S[n] <- s
+    Swiss[n, ] <- c( s*cos(s), t, s*sin(s) )
+}
+
+# generate washer in 2d 
+N <- 1e5
+washer <- matrix(NA, nrow =N, ncol = 2)
+for (n in 1:N){
+  r <- runif(1,min=5,max = 10); 
+  a = runif(1,min = 0, max = pi); 
+  washer[n,] <- r*c(cos(a),sin(a)) + c(20,0)
+  }
+
+# generate folded washer in 3D
+washer3 <- cbind(washer, washer[,2]^2)
+
+# generate rolled washer in 3D
+washer.swiss <- washer3
+for (n in 1:dim(washer3)[1] ){
+  washer.swiss[n,] <- c( washer[n,1]*cos(washer[n,1]), washer[n,2], washer[n,1]*sin(washer[n,1] )) 
+}
+
+```
+
+
+
+
+#  {.tabset}
+
+## Data and 3D Scatterplots {.tabset}
+
+### Helix
+```{r, echo = FALSE}
+ scatterplot3d(helix, color = myColorRamp(c("red","blue"), helix[,3] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+
+```
+
+### Swiss Roll
+```{r, echo = FALSE}
+scatterplot3d(Swiss, color = myColorRamp(c("red","purple","blue","green","yellow"), S ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+```
+
+
+### Washer
+```{r, echo = FALSE}
+plot(washer, xlab = '', ylab = '',
+     main = "Washer in 2D", col = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1] )
+)
+```
+
+### Folded Washer
+```{r}
+scatterplot3d(washer3,
+              color = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]),
+              main = "Folded Washer")
+```
+
+### Rolled Washer
+
+```{r}
+scatterplot3d(washer.swiss,
+              color = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1]),
+              xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]),
+              main = "Rolled Washer",
+              cex.symbols  = 0.1
+)
+```
+
+## ISOMAP {.tabset}
+
+Below, we show the manifold learning of the given manifolds using ISOMAP with $K = 20$ nearest neighbors.
+
+### Helix
+
+```{r}
+par(mfrow = c(1,2) )
+scatterplot3d(helix, color = myColorRamp(c("red","blue"), helix[,3]),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]) )
+test <- embed(helix, "Isomap", .mute = c("message", "output"), ndim =1)
+distance_correlation(test)
+plot(test@data@data, rep(0,dim(helix)[1]),
+     xlab = "1st Dimension", ylab = "", yaxt = 'n',
+     col = myColorRamp(c("red","blue"), helix[,3]) )
+```
+
+### Swiss Roll
+
+```{r, message= FALSE}
+par(mfrow = c(1,2))
+scatterplot3d(Swiss, color = myColorRamp(c("red","purple","blue","green","yellow"), S ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(Swiss, "Isomap", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), S)  
+     )
+```
+
+### Folded Washer
+
+```{r}
+N <- 2000
+par(mfrow = c(1,2))
+scatterplot3d(washer3[1:N,], color = myColorRamp(c("red","purple","blue","green","yellow"), washer[1:N,1] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(washer3[1:N,], "Isomap", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1])  )
+```
+
+### Rolled Washer
+
+```{r}
+N <- 2000;
+par(mfrow = c(1,2))
+scatterplot3d(washer.swiss[1:N,], color = myColorRamp(c("red","purple","blue","green","yellow"), washer[1:N,1] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(washer.swiss[1:N,], "Isomap", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1])  )
+```
+
+## Local Linear Embedding (LLE) {.tabset} 
+
+Below, we show the manifold learning of the given manifolds using LLE with $K = 20$ nearest neighbors.
+
+### Helix
+
+```{r, message= FALSE}
+par(mfrow = c(1,2) )
+scatterplot3d(helix, color = myColorRamp(c("red","blue"), helix[,3]) )
+plot(embed(helix, "LLE", .mute = c("message", "output"), ndim =1)@data@data, rep(0,dim(helix)[1]),
+     xlab = "1st Dimension", ylab = "", yaxt = 'n',
+     col = myColorRamp(c("red","blue"), helix[,3]) )
+```
+
+### Swiss Roll
+
+```{r, message= FALSE}
+par(mfrow = c(1,2))
+scatterplot3d(Swiss, color = myColorRamp(c("red","purple","blue","green","yellow"), S ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(Swiss, "LLE", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), S)  )
+```
+
+### Folded Washer
+
+```{r, message= FALSE}
+N <- 2000;
+par(mfrow = c(1,2))
+scatterplot3d(washer3[1:N,], color = myColorRamp(c("red","purple","blue","green","yellow"), washer[1:N,1] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(washer3[1:N,], "LLE", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1])  )
+```
+
+### Rolled Washer
+
+```{r, message= FALSE}
+N <- 2000
+par(mfrow = c(1,2))
+scatterplot3d(washer.swiss[1:N,], color = myColorRamp(c("red","purple","blue","green","yellow"), washer[1:N,1] ),
+               xlab = expression(x[1]), ylab = expression(x[2]), zlab = expression(x[3]))
+plot(embed(washer.swiss[1:N,], "LLE", .mute = c("message", "output"), ndim =2, knn = 20)@data@data,
+     xlab = "1st Dimension", ylab = "2nd Dimension",
+     col = myColorRamp(c("red","purple","blue","green","yellow"), washer[,1])  )
+```
+

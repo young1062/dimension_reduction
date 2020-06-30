@@ -1,0 +1,96 @@
+--- 
+title: 'STAT 185 - Homework #1'
+author: NAME
+output:
+  html_document:
+    df_print: paged
+---
+
+# {.tabset}
+This assignment is a review of important topics from linear algebra.  Additionally, it provides an introduction to R, RStudio, and RMarkdown for new users.  Be sure to uncomment (remove the `#` from the R code) before running the commands.
+
+
+## Linear Algebra Review 
+
+This assignment should cover a high level review of undergraduate linear algebra.  Topics such as spans, subspaces and dimension, basis, rank, eigenvectors/values.  
+
+
+## R Coding 
+
+For many undergraduates R is unfamiliar.  Sample problems below are intended to refresh or introduce R which is used extensively throughout the course.
+
+1) Consider the matrix 
+
+a. Write R code to add $A$ as a variable in R. 
+\[
+A = \left[  
+\begin{matrix}
+1 & 0 & 1 & 0 \\
+0 & 1 & 0 & 0 \\
+1 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{matrix}
+\right]
+\]
+    
+```{r, collapse=TRUE}
+# A <- 
+```
+
+b. Find the eigenvalues and corresponding eigenvectors of $A$. Write these to a variable called *A.eigen*. You may find the command *eigen()* helpful. 
+
+```{r, collapse=TRUE}
+# A.eigen <- 
+```
+    
+c. Find matrices $P$ and $D$ such that $A=PDP^{-1}$ and write these to variables in R.
+
+```{r, collapse=TRUE}
+# P <- 
+# D <-
+```
+    
+    
+d. Let's calculate $PDP^{-1}$ in R to verify your answer to part (c) is correct.
+
+```{r, collapse=TRUE}
+# A - P %*% D %*% solve(P)
+```
+    
+2. Consider the `mtcars` dataset which is available from the `datasets` library. We can load the `datasets` library and view the `mtcars` dataset using the chunk of code: 
+
+```{r, collapse = TRUE}
+library(datasets) # load the datasets 
+mtcars # view the mtcars dataset
+```
+We can also view a summary of the *mtcars* dataset using the command  *summary*:
+```{r}
+summary(mtcars) # view a summary of the mtcars dataset
+```
+Write commands to complete the following tasks.
+
+a. List the names of all cars with 4 gears.
+```{r}
+# your code here
+```
+    
+b. List the names of all cars with at least 100 horsepower.
+```{r}
+# your code here
+```
+    
+c. Find the highest mpg.
+```{r}
+# your code here
+```
+    
+d. Find the name of the car with the highest mpg.
+```{r}
+# your code here
+```
+  
+e. Create a scatterplot of the *mpg* (dependent variable) vs. *wt* (independent variable).
+```{r}
+# your code here
+```
+
