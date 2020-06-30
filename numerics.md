@@ -1,6 +1,7 @@
 ---
 layout: page
 title: "Numerical Examples"
+permalink: /dimension_reduction/numerics/
 ---
   
 
