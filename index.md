@@ -1,3 +1,7 @@
+---
+layout: default
+---
+
 <h1> Welcome </h1>
 This webpage contains content for an introductory course in Dimension Reduction first offered by Harvard University's <a href="https://statistics.fas.harvard.edu/">Statistics Department</a> during the Fall 2019 semester.   This class is intended for a single semester and is targeted at upper level undergraduate students.  It covers classical topics such as principal component analysis, nonnegative matrix factorization, and clustering with illustrative applications. The goal of this course is not to provide a complete summary of existing methods or software packages.  Rather, using mostly linear algebra, probability, and some coding in R, we  selected techniques are explored and their strengths/weaknesses are discussed.  This course focuses largely on a geometrical perspective of dimension reduction algorithms and the curious and often surprising nature of high-dimensional data.  
 
@@ -10,7 +14,7 @@ The original development and perspective was driven largely by an extremely help
 <li> <a href="https://web.stanford.edu/~hastie/ElemStatLearn/"> The Elements of Statistical Learning </a> by Trevor Hastie, Robert Tibrishani, and Jerome Friedman </li>
 <li> <a href="https://astro.temple.edu/~alan/MMST/"> Modern Multivariate Statistical Techniques </a> by Alan Julian Izenmann </li>
 </ul>
-were instrumental the construction of the lecture notes.
+were instrumental to the construction of the lecture notes.
 
 
 
