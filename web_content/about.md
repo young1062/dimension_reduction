@@ -6,5 +6,5 @@ Alex Young is the Undergraduate Advisor and Lecturer in Statistics in the <a hre
 
 <a href="https://sites.google.com/view/alexander-l-young/home" class="btn" style="color:#157878">Personal Website</a>
 <a href="https://scholar.google.com/citations?user=CZpyR9AAAAAJ&hl=en" class="btn" style="color:#157878">Google Scholar</a>
-<a href="https://github.com/young1062/" class="btn" style="color:#157878">GitHub</a>
+<a href="https://github.com/young1062/" class="btn" style="color:#157878; border-color:#157878">GitHub</a>
 
