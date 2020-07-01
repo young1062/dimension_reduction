@@ -4,7 +4,7 @@ layout: page
 
 <h2> Sample Calendar and Assignments </h2>
 
-The initial <a href="../Course_Information/syllabus.pdf" target="_blank"> syllabus</a> for the course included compressed sensing and variational autoencoders. However, given pacing of the course and the student background in linear algebra, these topics were omitted to provide additional time for the Singular Value Decomposition and Model-based Clustering.
+The initial <a href="../Course_Information/Syllabus.pdf" target="_blank"> syllabus</a> for the course included compressed sensing and variational autoencoders. However, given pacing of the course and the student background in linear algebra, these topics were omitted to provide additional time for the Singular Value Decomposition and Model-based Clustering.
 
 <ul>
 <li>Week 1</li>
