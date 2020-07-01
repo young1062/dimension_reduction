@@ -22,6 +22,6 @@ were instrumental to the construction of the lecture notes and select exercises 
 
 <h2> Contact </h2>
 
-Instructors are welcome to use these materials to develop their own dimension reduction courses.  For additional information including solutions, please contact Alex Young at **alexander underscore young at fas.harvard.edu**.  
+Instructors are welcome to use these materials to develop their own dimension reduction courses.  For additional information including solutions, please contact Alex Young at *alexander underscore young at fas.harvard.edu*.  
 
 
