@@ -1,7 +1,7 @@
 --- 
-title: 'STAT 185 - Problem Set #6'
-date: November 19, 2019
-output: pdf_document
+title: 'Homework #6'
+date: 
+output: html_document
 urlcolor: blue
 ---
 
@@ -11,11 +11,11 @@ set.seed(1) # for reproducibility of results
 require("dimRed")
 require("lle")
 require("scatterplot3d")
-load("pset6.Rdata")
+load("Homework6.Rdata")
 ```
 ## Instructions {.tabset}
 
-This assignment covers nonlinear manifold learning (ISOMAP and LLE) and the Johnson-Lindenstrauss Lemma through a mixture of theory and coding.  You will need the file *pset6.Rdata* available on Canvas.  The commands for loading the data assume this file, *pset6.Rmd*, and the Rdata file are in the same folder.
+This assignment covers nonlinear manifold learning (ISOMAP and LLE) and the Johnson-Lindenstrauss Lemma through a mixture of theory and coding.  You will need the file *Homework6.Rdata* available on Canvas.  The commands for loading the data assume this file, *Homework6.Rmd*, and the Rdata file are in the same folder.
 
 You can use the command *out<-embed(data, "Isomap", ndim = d, knn = k, get_geod = TRUE)* to compute the $d$ dimensional representation of a data matrix *data* using the ISOMAP algorithm with $k$-nearest neighbors.  The $d$-dimensional representation of the data is stored in *out\@data\@data* and the estimated geodesic distances are stored in *out\@other.data\$geod*.
 

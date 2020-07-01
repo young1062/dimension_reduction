@@ -9,7 +9,7 @@ This site contains a complete list of the covered topics and corresponding <a hr
 
 <h2> Course Philosophy </h2>
 
-Dimension reduction is a vast field comprised of many goals, assumptions, and algorithms.  Often the background material relevant to a specific algorithm relies on more advanced (graduate) level analysis.  However, this class is targeted at upper level undergraduate students.  The goal of this course is not to provide a complete summary of existing methods or software packages.  Rather, using mostly linear algebra, probability, and some coding in R,  selected techniques are explored and their strengths/weaknesses are discussed.  This course focuses largely on a geometrical perspective of dimension reduction algorithms and the curious and often surprising nature of high-dimensional data. 
+Dimension reduction is a vast field comprised of many goals, assumptions, and algorithms.  Often, the background material relevant to a specific algorithm relies on more advanced (graduate) level analysis.  However, this class is targeted at upper level undergraduate students and assumes familiarity with multivariate statistics and undergraduate linear algebra. The goal of this course is not to provide a complete summary of existing methods or software packages.  Rather, using mostly linear algebra, probability, and some coding in R,  selected techniques are explored and their strengths/weaknesses are discussed.  This course focuses largely on a geometrical perspective of dimension reduction algorithms and the curious and often surprising nature of high-dimensional data.  In addition to 7 homework assignments and a midterm, students are tasked with writing a term paper exploring the details of a dimension reduction technique not covered in the class. 
 
 <h2> Acknowledgements and References </h2>
 
@@ -20,5 +20,8 @@ The original development and perspective was driven largely by an extremely help
 </ul>
 were instrumental to the construction of the lecture notes and select exercises from those texts are used in some of the recommended problem sets.
 
+<h2> Contact </h2>
+
+Instructors are welcome to use these materials to develop their own dimension reduction courses.  For additional information including solutions, please contact Alex Young at **alexander underscore young at fas.harvard.edu**.  
 
 

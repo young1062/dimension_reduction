@@ -1,19 +1,18 @@
 --- 
-title: 'STAT 185 - Problem Set #5'
-author: NAME
-date: November 5, 2019
-output: 
-  pdf_document:
-    extra_dependencies: ["tikz"]
+title: 'Homework #5'
+author:
+date: 
+output: html_document
 ---
-```{r, echo = FALSE, verbose = FALSE, message = FALSE}
+```{r, echo = FALSE, verbose = FALSE, message = FALSE, warning = FALSE}
 set.seed(1) # for reproducibility of results
+require("magick")
 require("MASS")
 require("scatterplot3d")
-load("pset5.Rdata")
+load("Homework5.Rdata")
 ```
 ## Instructions {.tabset}
-This assignment covers Multidimensional Scaling and nonlinear manifolds through a mixture of theory and coding.  You will need the file *pset5.Rdata* available on Canvas.  The commands for loading the data assume this file, *pset5.Rmd*, and the Rdata file are in the same folder.
+This assignment covers Multidimensional Scaling and nonlinear manifolds through a mixture of theory and coding.  You will need the file *Homework5.Rdata* available on Canvas.  The commands for loading the data assume this file, *Homework5.Rmd*, and the Rdata file are in the same folder.
 
 You can use the command *cmdscale(d, k , eig = FALSE)* to compute the solution to the classical scaling problem. Here $d$ is a matrix of distances, $k$ is the dimension of the desired configuration, and the option *eig=TRUE* may be added so that eigenvalues are also reported.
 
@@ -60,8 +59,8 @@ For all subproblems, assume that $C$ is a positive semidefinite similarity matri
     c. Carry out nonmetric scaling of the data.  Generate a plot of the Kruskal Stress as a function of dimension and show the configuration in 2-dimensions. (See Figure 13.3 of the Izenman text for reference).
     
 4.  Suppose that $1,\dots,7$ are regions enclosed by unbroken lines in a country shown in the arrangement below.  
-\begin{figure}[!h]
-\begin{center}
+```{tikz, echo = FALSE, fig.width = 3, fig.align = 'center'}
+\usetikzlibrary{arrows}
 \begin{tikzpicture}
 \foreach \r in {1,2}{
 	\draw (0,0) circle (\r cm);
@@ -72,8 +71,7 @@ For all subproblems, assume that $C$ is a positive semidefinite similarity matri
 	\draw (60*\a - 60 :1.5) node{\a};
 }
 \end{tikzpicture}
-\end{center}
-\end{figure}
+```
     
     a. Suppose the distance matrix is constructed by counting the minimum number of boundaries crossed to pass from region $i$ to region $j$. Give the distance matrix, $D$.
     

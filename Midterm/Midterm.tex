@@ -1,0 +1,117 @@
+\documentclass[12 point]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+ \pagestyle{fancy}
+\fancyhf{}
+\rhead{Midterm}
+\lhead{Statistics 185}
+\lfoot{October 17, 2019}
+\rfoot{Page \thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+\title{Statistics 185 - Midterm}
+\date{October 17, 2019}
+\begin{document}
+\thispagestyle{empty}
+\maketitle
+\vspace{2cm}
+\begin{center}Name(print):\line(1,0){300}\end{center}
+
+\vspace{1.5cm}
+\noindent This is a closed-book exam so do not refer to your notes or any
+other books.  There are 6 problems.\\
+
+\noindent Write your solutions as clearly as possible and make sure it's easy to find your answers (circle them if necessary), since you will not receive credit for work that I cannot understand or find. Good Luck! \\
+
+\noindent If you find a question confusing, please ask me to clarify it. \\
+
+\noindent If you need additional sheets, please ask and I will supply you with blank printer paper.
+
+\vspace{1.25 cm}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{| >{\centering\arraybackslash}m{2cm} | >{\centering\arraybackslash}m{2cm} | }
+\hline
+Question & Points\\
+\hline
+1 &  \\
+\hline
+2&  \\
+\hline
+3&  \\
+\hline
+4&   \\
+\hline
+5&   \\
+\hline
+6&   \\
+\hline
+\end{tabular} \\
+\vspace{0.25cm}
+\begin{tabular}{|>{\centering\arraybackslash}m{2cm} | >{\centering\arraybackslash}m{2cm} |}
+\hline
+Total & \\
+\hline
+
+\end{tabular}
+\end{center}
+\newpage
+\begin{enumerate}
+\item Suppose that $\vec{x}\in \mathbb{R}^p$ has mean $\vec{0}$ and covariance $I$.  Let $A \in \mathbb{R}^{q\times p}$ be a full rank matrix with $p > q$ and let  $\vec{y} = A\vec{x} + \vec{\epsilon}$ be a vector in $\mathbb{R}^q.$ where $\vec{\epsilon} \sim \mathcal{N}(0,\rho^2 I_q)$ is independent of $\vec{x}.$
+\begin{itemize}
+\item[a.] Find $\Sigma_y$ and $\Sigma_{xy}.$
+    \vspace{8 cm}
+\item[b.]  Find the canonical correlations between $\vec{x}$ and $\vec{y}.$ Express your answer in terms of $\rho^2$ and the singular values of $A$.
+\end{itemize}
+    
+\newpage
+
+\item Suppose $\vec{q}_1,\dots,\vec{q}_k$ are orthonormal vectors in $\mathbb{R}^d$ with $k < d.$  Suppose $$\vec{x} = a_1\vec{q}_1+\dots + a_k \vec{q}_k + \vec{\epsilon}$$
+where $a_1,\dots,a_k$ are uncorrelated, mean zero random variables with variance $\lambda^2$ and $\vec{\epsilon}$ is independent of $a_1,\dots,a_k$ and follows a multivariate Normal distribution with mean $\vec{0}$ and covariance $\sigma^2 I$. Here, $I$ is the $d-$dimensional identity matrix.
+\begin{itemize}
+\item[a.] Find the mean of $\vec{x}$.
+\vspace{3cm}
+ \item[b.] Find the covariance matrix, $\Sigma$, of $\vec{x}$.
+\vspace{5cm}
+\item[c.] Give the eigenvalues and respective eigenvectors of $\Sigma.$  (Hint: you may assume there are orthonormal vectors $\vec{q}_{k+1},\dots,\vec{q}_d$ which are a basis for the orthogonal complement of the span of $\vec{q}_1,\dots,\vec{q}_d.$)
+\end{itemize}
+\newpage
+\item Let $\vec{x}_1,\dots,\vec{x}_N$ be vectors in $\mathbb{R}^d$. Assume a PCA of these data has loadings $\vec{w}_1,\dots,\vec{w}_d$ with associated variances $\lambda_1 \ge \dots \ge \lambda_d \ge 0.$ Let $U$ be a $d\times d$ orthonormal matrix and set $\vec{y}_i = U\vec{x}_i.$ Find expressions for the principal components loadings and variance of $\vec{y}_1,\dots,\vec{y}_N$ in terms of $U$, $\vec{w}_1,\dots,\vec{w}_d$ and $\lambda_1,\dots,\lambda_d.$
+
+
+\newpage
+\item Let $$ \| X - WH\|_F = \sqrt{\sum_{i,j}[X_{ij} - (WH)_{ij}]^2}$$ where $X \in \mathbb{R}^{N\times p}$, $W\in \mathbb{R}^{N\times k}$, and $H\in \mathbb{R}^{k\times p}$.
+\begin{itemize}
+\item[a.] Find the partial derivative of $\frac{1}{2}\| X - WH\|_F^2$ with respect to $W_{ij}$.
+\vspace{9 cm}
+\item[b.] Find the partial derivative of $\frac{1}{2}\| X - WH\|_F^2$ with respect to $H_{jl}$.
+\end{itemize}
+
+\newpage
+\item Suppose $\vec{x} \in \mathbb{R}^p$ and $\vec{y} \in \mathbb{R}^q$ are random vectors with covariance matrices $\Sigma_x$ and $\Sigma_y$ respectively.  Suppose $\vec{x}$ and $\vec{y}$ have cross-covariance matrix $\Sigma_{xy}$ with rank $k \le \min \{p,q\}$ and canonical correlation variable $\eta_1,\dots,\eta_k$ and $\xi_1,\dots,\xi_k$ with canonical correlations $\sigma_1\ge \dots \ge \sigma_k>0$.  
+	\begin{itemize}
+ 	 \item[a.]  Find the covariance matrices of the random vectors $\vec{\eta} = 					(\eta_1,\dots,\eta_k)^T$ and $\vec{\xi} = (\xi_1,\dots,\xi_k)^T.$
+    		\vspace{8 cm}
+   	 \item[b.]  Find the cross-covariance of $\vec{\eta}$ and $\vec{\xi}.$
+    \end{itemize}
+
+
+\newpage
+\item Let $\vec{x}_1,\dots,\vec{x}_N$ be random vectors in $\mathbb{R}^p$ with sample covariance $\hat{\Sigma}_X$ and $\vec{y}_1,\dots,\vec{y}_N$ be random vectors in $\mathbb{R}^q$ with covariance matrix $\hat{\Sigma}_Y$.  Assume that $\hat{\Sigma}_X$ and $\hat{\Sigma}_Y$ are both full rank, i.e. the principal component variances of both $\vec{x}_1,\dots,\vec{x}_n$ and the principal component variances of $\vec{y}_1,\dots,\vec{y}_N$ are all positive.  
+
+Let $\vec{z}_i ^T = (\vec{x}_i^T,\vec{y}_i^T)$ for $i=1,\dots,N$ be random vectors in $\mathbb{R}^{p+q}$ with sample covariance $\hat{\Sigma}_Z.$  Now assume $\hat{\Sigma}_Z$ is not full rank, i.e. at least one of the principal component variances of $\vec{z}_1,\dots,\vec{z}_N$ is zero. Is the largest canonical correlation between $\{\vec{x}_i\}_{i=1}^N$ and $\{\vec{y}_i\}_{i=1}^N$ equal to 1?  Explain your answer.  
+
+Hint: If $A\in\mathbb{R}^{p \times p}$, $B\in\mathbb{R}^{p\times q}$, $C\in \mathbb{R}^{q\times p}$, and $D\in\mathbb{R}^{q\times q}$ are matrices and $A$ is invertible then
+$$det\bigg(\begin{bmatrix} A&B\\C& D\end{bmatrix} \bigg) = det(A) det(D - CA^{-1}B).$$  You do not need this hint. It just offers one route to a solution.
+
+\end{enumerate}
+
+
+\end{document}

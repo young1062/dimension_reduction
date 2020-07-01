@@ -16,7 +16,7 @@ A sample syllabus for the Fall 2019
 <li>Week 2</li>
   <ul>
   <li> Topics: Principal Component Analysis</li>
-  <li> Assignments: <a href="../Homework/Homework 1/Homework1.html">Homework 1 Posted</a> </li>
+  <li> Assignments: <a href="../Homework/Homework 1/Homework1.html" target="_blank">Homework 1 Posted</a> </li>
   </ul>
 
 <li>Week 3</li>
@@ -30,75 +30,68 @@ A sample syllabus for the Fall 2019
   <li> Topics: Singular Value Decomposition, Canonical Correlation Analysis</li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 5</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 6</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 7</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 8</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 9</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 10</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 11</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 12</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 13</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
-</ul>
 
 <li>Week 14</li>
   <ul>
   <li> Topics: </li>
   <li> Assignments: </li>
   </ul>
+  
+  
 </ul>
+
 

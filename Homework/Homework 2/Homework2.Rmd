@@ -1,16 +1,16 @@
 --- 
-title: 'STAT 185 - Homework #2'
-author: NAME
-output: pdf_document
+title: 'Homework #2'
+author: 
+output: html_document
 ---
 ```{r, echo = FALSE, verbose = FALSE, message = FALSE}
 set.seed(1) # for reproducibility of results
 require("MASS")
 require("scatterplot3d")
-load("pset2.Rdata")
+load("Homework2.Rdata")
 ```
 # {.tabset}
-This assignment covers multivariate probability and Principal Component Analysis through a mixture of theory and coding.  You will need the file *pset2.Rdata* available on Canvas.  The commands for loading the data assume this file, *Homework2.Rmd*, and the Rdata file are in the same folder.
+This assignment covers multivariate probability and Principal Component Analysis through a mixture of theory and coding.  You will need the file *Homework2.Rdata* available on Canvas.  The commands for loading the data assume this file, *Homework2.Rmd*, and the Rdata file are in the same folder.
 
 Complete the following questions and submit your solutions as a *pdf* via Canvas by Tuesday September 24th at 11:59 PM.
 

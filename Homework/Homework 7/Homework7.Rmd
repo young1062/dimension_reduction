@@ -1,8 +1,8 @@
 --- 
-title: 'STAT 185 - Problem Set #7'
-author: NAME
-date: December 3, 2019
-output: pdf_document
+title: 'Homework #7'
+author: 
+date: 
+output: html_document
 url_color: blue
 ---
 
@@ -13,7 +13,7 @@ require(mclust)
 require(cluster)
 require(kernlab)
 require(scatterplot3d)
-load("pset7.rData")
+load("Homework7.rData")
 ```
 
 ## Instructions {.tabset}
@@ -30,59 +30,13 @@ load("pset7.rData")
 
 ## Problems
 
-1.  (Blum 7.1) Construct examples where using distances instead of distance squared gives bad results for Gaussian densities. For example, pick samples from two 1-dimensional unit variance Gaussians, with their centers 10 units apart. Cluster these samples by trial and error into two clusters, first according to k-means and then according to the k-median criteria. The k-means clustering should essentially yield the centers of the Gaussians as cluster centers. What cluster centers do you get when you use the k-median criterion?
+1.  Blum - Problem 7.1
 
+2. Hastie - Problem 14.5 
 
-2. (Hastie 14.5) Generate data with three features, with 30 data points in each of three classes as follows:
-
-$$
-\begin{aligned}
-\theta_1 &= U(-\pi/8,\pi/8) \\
-\phi_1 &= U(0,2\pi) \\
-x_1 &= \sin(\theta_1)\cos(\phi_1) + W_{11}\\
-y_1 &= \sin(\theta_1)\sin(\phi_1) + W_{12}\\
-z_1 &= \cos(\theta_1) + W_{13}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\theta_2 &= U(\pi/4,3\pi/4) \\
-\phi_2 &= U(-\pi/4,\pi/4) \\
-x_2 &= \sin(\theta_2)\cos(\phi_2) + W_{21}\\
-y_2 &= \sin(\theta_2)\sin(\phi_2) + W_{22}\\
-z_2 &= \cos(\theta_2) + W_{23}
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-\theta_3 &= U(\pi/4,3\pi/4) \\
-\phi_3 &= U(\pi/4,3\pi/4) \\
-x_3 &= \sin(\theta_3)\cos(\phi_1) + W_{31}\\
-y_3 &= \sin(\theta_3)\sin(\phi_1) + W_{32}\\
-z_3 &= \cos(\theta_3) + W_{33}
-\end{aligned}
-$$
-
-Here $U(a,b)$ indicates a uniform variate on the range $[a,b]$ and $W_{jk}$ are independent normal variates with standard deviation 0.6. The data
-lie near the surface of a sphere in three clusters centered at $(1, 0, 0)^T$, $(0, 1, 0)^T$ and $(0, 0, 1)^T$.
-Carry out a $K$-means, $K$-medoid, and Model-based clustering of the same data and compare the results. In all three cases, assume 3 components. For the model based clustering use *modelNames = "EII"* fir a Gaussian mixture models with covariance $\sigma^2 I$ in all three clusters.
-
-3. (Hastie 14.2) Consider a mixture model density in $p$-dimensional space, $$g(x) = \sum_{k=1}^K \pi_k g_k(x),$$ where $g_k(x) = \mathcal{N}(\mu_k, \sigma^2{\bf I})$ and $\pi_k \ge 0$ for all $k$ with $\sum_k \pi_k = 1$.  Here $\{\mu_k,\pi_k\}_{k=1}^K$ and $\sigma^2$ are the unknown parameters. 
-Suppose we have data $x_1,\dots,x_N \sim g(x)$ and we wish to fit the mixture model.
-
-    a.  Write down the log-likelihood of the data.
+3. Hastie - Problem 14.2 
     
-    b.  Derive an EM algorithm for computing the maximum likelihood estimates of the unknown parameters.
-    
-    c.  Show that if $\sigma$ has a known value in the mixture model and we take $\sigma\to 0$, then in a sense this EM algorithm conincides with $K$-means clustering.
-    
-4. (Izenman 12.3) The variable *primate.scapulae* consists of measurements of indices and angles on the scapulae (shoulder bones) of five genera of adult primates representing Hominoidae: gibbons (Hylobates), orangutangs (Pongo), chimpanzees (Pan), gorillas (Gorilla), and man (Homo). The variables of interest are 5 indices (AD.BD, AD.CD, EA.CD, Dx.CD, and SH.ACR) and 2 angles (EAD, $\beta$). The $gamma$ variable is missing for some data so we will ignore it. Of the 105 measurements on each variable, 16 were from Hylobates, 15 from Pongo, 20 from Pan, 14 from Gorilla, and 40 from Homo.
-
-    a.  Cluster the *primate.scapulae* data using single-linkage, average-linkage, and complete-linkage agglomerative hierarchical clustering using Euclidean distance. Print the dendrogram for each method. 
-
-    b.  Find the five-cluster solutions for all three methods which allows comparision with the true primate classifications which are stored in the variable *primate.scapulae\$classdigit*.  Using the 5-cluster solution, find the misclassification rate for all three methods.  Show that the lowest rate occurs for the complete-linkage method and the hightest for the single-linkage method.
+4. Izenman - Problem 12.3 
     
 5.  A plot of the data contained in the matrix *smile* is comprised of four pieces (two eyes, a nose, and a mouth) shown below.
 

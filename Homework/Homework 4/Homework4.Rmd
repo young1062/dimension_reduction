@@ -1,18 +1,18 @@
 --- 
-title: 'STAT 185 - Problem Set #4'
+title: 'Homework #4'
 author: NAME
-output: pdf_document
+output: html_document
 urlcolor: blue
 ---
 
 # {.tabset}
-This assignment covers Nonnegative Matrix Factorization and Archetypal Analysis through a mixture of theory and coding using the packages [NMF](http://renozao.github.io/NMF/master/vignettes/NMF-vignette.pdf) and [archetypes](https://cran.r-project.org/web/packages/archetypes/vignettes/archetypes.pdf).  You will need the file *pset4.Rdata* available on Canvas.  The commands for loading the data assume this file, *pset4.Rmd*, and the Rdata file are in the same folder.
+This assignment covers Nonnegative Matrix Factorization and Archetypal Analysis through a mixture of theory and coding using the packages [NMF](http://renozao.github.io/NMF/master/vignettes/NMF-vignette.pdf) and [archetypes](https://cran.r-project.org/web/packages/archetypes/vignettes/archetypes.pdf).  You will need the file *Homework4.Rdata* available on Canvas.  The commands for loading the data assume this file, *Homework4.Rmd*, and the Rdata file are in the same folder.
 
 ```{r, echo = FALSE, verbose = FALSE, message = FALSE}
 require("archetypes")
 require("NMF")
 require("grDevices")
-load('pset4.Rdata')
+load('Homework4.Rdata')
 ```
 
 

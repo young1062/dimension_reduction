@@ -1,6 +1,6 @@
 --- 
-title: 'STAT 185 - Homework #1'
-author: NAME
+title: 'Homework #1'
+author: 
 output:
   html_document:
     df_print: paged
