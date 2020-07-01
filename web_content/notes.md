@@ -2,10 +2,10 @@
 layout: page
 ---
 
-The links below contain pdf files of the scanned lecture notes for all topics covered in the course. 
+The links below contain pdf files of the scanned lecture notes for all topics covered in the course and are presented in the order in which they are covered.  Please see the <a href="calendar">Calendar</a> section for the recommended pacing of the course along with suggested exercises. 
   
 <ul>
-<li> <a href="../Lecture_Notes/Review.pdf"> Linear algebra and Multivariate Stats Review </a></li>
+<li> <a href="../Lecture_Notes/Handwritten/Review.pdf"> Linear algebra and Multivariate Stats Review </a></li>
 <li> <a href="../Lecture_Notes/Handwritten/PCA.pdf" target="_blank"> Principal Components Analysis (PCA) </a> </li>
 <li> <a href="../Lecture_Notes/Handwritten/SVD.pdf" target="_blank"> Singular Value Decomposition (SVD) </a> </li>
 <li> <a href="../Lecture_Notes/Handwritten/CCA.pdf" target="_blank"> Canonical Components Analysis (CCA) </a> </li>
@@ -22,4 +22,6 @@ The links below contain pdf files of the scanned lecture notes for all topics co
   </ul>
 <li> <a href="../Lecture_Notes/Handwritten/Kernel_Methods.pdf" target="_blank"> Kernel Methods </a></li>
 </ul>
+
+Apologies for the poor resolution in some of the notes.  Over time, the notes will be updated with typeset versions.
 
