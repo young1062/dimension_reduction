@@ -6,17 +6,23 @@ output: html_document
 ---
   
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-require("NMF")
+knitr::opts_chunk$set(echo = FALSE, cache = TRUE)
+require("rNMF")
 require("archetypes")
-load("digits.Rdata")
+load("../../Datasets/digits.Rdata")
 ```
 
 
 
-# {.tabset}
+# {.tabset} 
 
-This document contains comparative examples of NMF and Archetypal Analysis applied to data from [MNIST](http://yann.lecun.com/exdb/mnist/) (LeCun et al.) containing pixelated images each viewed as a random vector. 
+This document contains comparative examples of NMF and Archetypal Analysis applied to image data to assist in visualizing the results.
+
+
+## MNIST {.tabset}
+
+
+In this example we focus on the [MNIST](http://yann.lecun.com/exdb/mnist/) (LeCun et al.) dataset containing pixelated images of handwritten digits. Each image viewed as a random vector in $\mathbb{R}^{784}$. 
 
 
 To reduce the computation burden, we will only consider the first 200 4s from the MNIST data stored in the list *digits*. We show the first 25 such images below (some of which are upside down).
@@ -32,37 +38,35 @@ for (j in 1:25){
 }
 ```
 
-## Nonnegative Matrix Factorization
+### Nonnegative Matrix Factorization
 
-To compute the NMF of these data we use the package *NMF* and command *nmf*. Among other arguments *nmf* takes 
+To compute the NMF of these data we use the package *rNMF* and command *rnmf*, which only implements the Froebinius norm for computing error. Among other arguments *rnmf* takes 
 
     i. *x* the data matrix,
     
-    ii. *rank* the desired rank, 
+    ii. *k* the desired rank, 
     
-    iii. *method* the method to calculating estimation error, and 
+    iii. *gamma = FALSE* to turn off any regularizing; *showprogress = FALSE* and *quiet = TRUE* to suppress the progress bar and output summaries from showing (a helpful change for avoiding a lot of needless text when compiling answers in your problem set solutions)
     
-    iv. *nrun* the number of runs to try at each rank.
-
 Thus, a single rank 3 NMF using the Frobenius norm can be found using the command
 
 ```{r}
-out <- nmf(digits4,3, method = "Frobenius")
-# out <- nmf(digits4, 3, method = "KL") # for divergence
+out <- rnmf(digits4, k = 3, gamma = FALSE, showprogress = FALSE, quiet = TRUE)
 ```
 
-The output *out* above contains the weights in matrix *out\@fit\@W* and features in *out\@fit\@H* and we can visual the features by generating images from the rows of *out\@fit\@H* which notably look like 4s!
+The output *out* above contains the weights in matrix *out\$W* and features in *out\$H* and we can visual the features by generating images from the rows of *out\$H* which notably look like 4s!
 
 ```{r, echo = FALSE}
 par(mar=c(1,1,1,1))
 par(mfrow = c(1,3))
 for (j in 1:3){
-  image(matrix(out@fit@H[j,], nrow = 28),
+  image(matrix(out$H[j,], nrow = 28),
         xaxt = 'n', yaxt = 'n')
 }
 ```
 
-Compare these images to the mean and first 2 principal components.  Note, we cannot conduct PCA using only 200 samples from 784-dimensional space!!!  For PCA, we expand to consider the first 800 4s.
+Compare these images to the mean and first 2 principal components.  Note, we cannot reliably conduct PCA using only 200 samples from 784-dimensional space!!!  For PCA, we expand to consider the first 800 4s.
+
 ```{r}
 N <- 800
 out.pca <- princomp(digits$pixels[digits$labels == 4,][1:N,])
@@ -79,22 +83,33 @@ for (j in 1:2){
 While the mean appears like a 4, the first and second principal component loadings appear less "4-like" thank their counterparts in NMF.
 
 
-However, a rank 3 approximation (particularly based on a single run of NMF) may not be optimal.  Let us compare ranks $1,\dots, 10$ each with 5 separate runs of the *NMF* algorithm.
+However, a rank 3 approximation (particularly based on a single run of NMF) may not be optimal.  Let us compare ranks $2,\dots, 10$ fit by the *rNMF* algorithm with five different initializations.
+
 ```{r, message= FALSE, verbose = FALSE, message= FALSE}
-out <- nmf(digits4, rank = 1:10, nrun = 5, method = "Frobenius")
-#takes ~ 10 minutes to run
+error <- rep(NA, 9)
+niter = 5
+for (k in 2:10){
+  out <- rnmf(digits4, k = k, gamma = FALSE, quiet = TRUE, showprogress = FALSE)
+  error[k-1] <- sum((digits4 - out$fit)^2)/2
+  for (n in 2:niter){
+    out <- sum((rnmf(digits4, k = k, gamma = FALSE, quiet = TRUE, showprogress = FALSE)$fit - digits4)^2)/2
+    if (out < error[k-1]){error[k-1] <- out}
+  }
+}
 ```
 
 The above calculation reports the performance of the best fit at each rank allowing us to plot the residual, $\frac{1}{2}\|X-WH\|^2$, as a function of rank.  Note: This plot provides information akin to the scree plot in PCA.
+
 ```{r, echo = FALSE}
-plot(out$measures$residuals,
+plot(2:10, error,
      xlab = "Rank",
      ylab = "Residual")
 ```
 
-The output *out* also contains the best weight and feature matrices, $W$ and $H$ respectively, at each rank.  Below we visualize the first 10 NMF features founds from the best rank $10$ NMF.
+Below we visualize the first 10 NMF features founds from the best rank $10$ NMF.
+
 ```{r}
-H <- out$fit$`10`@fit@H
+H <- rnmf(digits4, k = 10, gamma= FALSE, showprogress = FALSE, quiet = TRUE)$H
 par(mar=c(1,1,1,1))
 par(mfrow = c(5,2))
 for (j in 1:10){
@@ -102,7 +117,8 @@ for (j in 1:10){
         xaxt = 'n', yaxt = 'n')
 }
 ```
-While these image are "4-like" than the rank 3 approximation they do contain pieces of 4s and they avoid the catastrophic cancelation inherent to PCA manifested in the neighboring regions of light(low pixel intensity) and dark(high pixel intensity). See the following block containing images based on the mean and first 9 principal component loadings!
+
+While these image are less "4-like" than the rank 3 approximation they do contain pieces of 4s and they avoid the catastrophic cancellation inherent to PCA manifested in the neighboring regions of light(low pixel intensity) and dark(high pixel intensity). See the following block containing images based on the mean and first 9 principal component loadings!
 
 
 ```{r,echo = FALSE}
@@ -117,7 +133,7 @@ for (j in 1:9){
 ```
 
 
-## Archetypal Analysis
+### Archetypal Analysis
 
 To compute the Archetypes of these data we use the package *archetypes* and the commands *archetypes* and *stepArchetypes*. Among other arguments these functions accept 
 
@@ -155,6 +171,7 @@ for (j in 1:3){
 ```
 
 However, an approximation using $3$ archetypes (particularly based on a single run) may not be optimal.  Let us compare $1,\dots, 25$ archetypes each estimated using 5 separate runs of the *archetypes* algorithm.
+
 ```{r, message= FALSE, verbose = FALSE, message= FALSE}
 out <- stepArchetypes(digits4[,-zerocol], k = 1:10, nrep = 5,
                   family = archetypesFamily("original",
@@ -166,6 +183,7 @@ out <- stepArchetypes(digits4[,-zerocol], k = 1:10, nrep = 5,
 ```
 
 The above calculation reports the performance of the best fit for each number of archetypes allowing us to plot the residual, $\frac{1}{2}\|X-WH\|^2$, as a function of rank.  Note: This plot provides information akin to the scree plot in PCA.  However, the Residual here cannot be compared directly to the NMF since we had to remove all columns which were identically zero.  As a result, the fits here are in much lower dimensions and will naturally have smaller errors/residuals.
+
 ```{r, echo = FALSE}
 RSS <- rep(0,10); for (j in 1:10){RSS[j] <- bestModel(out)[[j]]$rss}
 plot(RSS,
@@ -174,8 +192,9 @@ plot(RSS,
 ```
 
 The output *out* also contains the best weight and feature matrices, $W$ and $H$ respectively, at each rank.  Below we visualize the archetypes found from the best 10 archetype NMF.
+
 ```{r}
-  H <- bestModel(out[[10]])$archetypes
+H <- bestModel(out[[10]])$archetypes
 par(mar=c(1,1,1,1))
 par(mfrow = c(5,2))
 for (j in 1:10){
@@ -186,3 +205,97 @@ for (j in 1:10){
 ```
 
 
+##  Symbols {.tabset}
+
+The *Symbols* data is supplied by the *rNMF* package as a tutorial on the effects of NMF.  This dataset contain 30 images of vectorized pixels of 75 $\times$ 75 images show below. We can view these images as 30 samples of random vectors residing in $75^2=5625$ dimension space. Each image contains one or more of four shapes. Note, to visualize the images we use the *see* command which takes as an argument *see(X)* where $X$ is a matrix with one image per **column**.
+
+```{r}
+data("Symbols")
+see(Symbols, title = "Images", col = "grey")
+```
+
+### NMF
+
+In this case, a natural choice for the NMF rank is 4 corresponding to the four different types of shapes that appear in the different corners of the images above.
+
+```{r}
+out <- rnmf(t(Symbols), k = 4, gamma = FALSE, showprogress = FALSE, quiet = TRUE)
+```
+
+Note above that the *Symbols* dataset is comprised of one image per column (the transpose of our convention for data matrices).  Thus, we input $t(Symbols)$ into the *rnmf* command so that matrix $H$ has the same interpretation as our class notes.  We then transpose $H$ in the *see* call to match with that functions convention of one image per column shown below!  Here are the results of a single run of NMF with a random initial condition
+
+```{r}
+see(t(out$H), col = "grey", title = "Images extracted from rank 4 NMF of Symbols Data")
+```
+
+Let us repeat this analysis with a number of random initializations and choose the best option.
+
+```{r}
+ntries <- 15;
+out <- rnmf(t(Symbols), k = 4, gamma = FALSE, showprogress = FALSE, quiet = TRUE)
+error <- sum((out$fit - t(Symbols))^2)/2
+for (k in 2:niter){
+  temp <- rnmf(t(Symbols), k = 4, gamma = FALSE, showprogress = FALSE, quiet = TRUE)
+  if (sum((temp$fit - t(Symbols))^2)/2 < error){
+    out <- temp
+    error <- sum((out$fit - t(Symbols))^2)/2
+  }
+}
+see(t(out$H), col = "grey", "Best result of rank 4 NMF")
+```
+
+In this case, multiple runs eventually settle on an NMF where each basis element contains one and only one of the 4 possible symbols!!!!
+
+
+### Archetypal Analysis
+
+Below we show the four archetypes selected from among 20 separate runs of archetypal analysis.
+
+```{r, warning = FALSE, verbose = FALSE}
+ntries <- 20;
+out <- archetypes(t(Symbols), k = 4,
+                  family = archetypesFamily("original", 
+                                            zalphasfn =archetypes:::ginv.zalphasfn)
+                  )
+for (k in 2:ntries){
+  temp <- archetypes(t(Symbols), k = 4,
+                  family = archetypesFamily("original", 
+                                            zalphasfn =archetypes:::ginv.zalphasfn)
+                  )
+  if (temp$rss < out$rss){
+    out <- temp
+  }
+}
+  
+see(t(out$archetypes), col = "grey", title= "4 archetypes of Symbols Data")
+```
+
+Similar to the digits result we could consider searching for a different number of fixed archetypes.  
+
+```{r, echo = FALSE, warning = FALSE}
+out <- stepArchetypes(t(Symbols), k = 1:10, nrep = 5,
+                  family = archetypesFamily("original",
+                                            zalphasfn =archetypes:::ginv.zalphasfn),
+                  verbose = FALSE
+                  )
+RSS <- rep(0,10); for (j in 1:10){RSS[j] <- bestModel(out)[[j]]$rss}
+
+plot(RSS,
+     xlab = "Number of Archetypes",
+     ylab = "Residual")
+
+H <- bestModel(out[[10]])$archetypes
+see(t(H), title = "10 Archteypes for Symbols Images")
+
+```
+
+
+### PCA
+
+For comparison suppose we generated basis images using the mean and first three PC loadings shown below. The upper left is the pixel by pixel mean of all Symbol images, and the next three images are based on the first three PC loadings (we rescale each loading by its corresponding PC standard deviation).
+
+```{r}
+pca.center <- rowMeans(Symbols)
+temp <- svd(t(Symbols - pca.center))
+see(cbind(pca.center,  temp$v[,1:3] %*% diag(temp$d[1:3]/sqrt(30))), col = "grey")
+```
